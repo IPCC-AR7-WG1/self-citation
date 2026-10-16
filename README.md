@@ -75,7 +75,8 @@ results and generate a new debug report.
                                                              bibliography, and separate CLA/LA
                                                              and CA self-citation tables
 
-  `<input>_Reference_Analysis_DEBUG_<group>_<author>.docx`   First-author and co-author cited
+
+    `<input>_Reference_Analysis_DEBUG_<group>_<author>.docx`   First-author and co-author cited
                                                              works for the selected author,
                                                              including the complete Zotero
                                                              author lists, title, year,
