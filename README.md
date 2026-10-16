@@ -1,6 +1,6 @@
 # Zotero Reference and Self-Citation Analysis
 
-A Python tool for analysing **IPCC chapter references and chapter-author
+A Python tool for analysing **WGI AR chapter references and chapter-author
 self-citations** in Microsoft Word documents containing live Zotero
 citation fields.
 
@@ -96,8 +96,8 @@ An individual chapter author is matched to Zotero author metadata using:
 -   Case, diacritics, selected punctuation and spacing normalized
 
 **Limitations:** Nicknames and different full first names (for example,
-`Chris Smith` versus `Christopher J. Smith`) are not automatically
-treated as equivalent. Initial-only names such as `C. Smith` are not
+`Jone Smith` versus `Jonathen C. Smith`) are not automatically
+treated as equivalent. Initial-only names such as `J. Smith` are not
 treated as confirmed matches. These may require manual review.
 
 ### Publication deduplication
