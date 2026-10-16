@@ -4,7 +4,7 @@ A Python tool for analysing **WGI AR chapter references and chapter-author
 self-citations** in the Microsoft Word version of the drafts containing live Zotero
 citation fields.
 
-For instance, you can use the compiled FOD in [Documents/03.Chapters/40.Draft preparation/02.FOD/03.FOD compiled/] (https://smu.sharepoint.com/:f:/r/teams/ipccwg1-ar7/Shared%20Documents/03.%20Chapters/40.%20Draft%20preparation/02.%20FOD/03.%20FOD%20compiled?d=w79bb9de1bbcb4aaf8469126041f7846a&csf=1&web=1&e=EJ0Tdi)
+For instance, you can use the compiled FOD in [Documents/03.Chapters/40.Draft preparation/02.FOD/03.FOD compiled/](https://smu.sharepoint.com/:f:/r/teams/ipccwg1-ar7/Shared%20Documents/03.%20Chapters/40.%20Draft%20preparation/02.%20FOD/03.%20FOD%20compiled?d=w79bb9de1bbcb4aaf8469126041f7846a&csf=1&web=1&e=EJ0Tdi)
 
 It produces a Word report with the chapter author lists, the rendered
 Zotero bibliography, and separate self-citation statistics for
