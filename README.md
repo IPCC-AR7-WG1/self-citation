@@ -214,15 +214,4 @@ name variants; initials and nicknames are not automatically resolved.
 file is accessible. The script uses a temporary local copy to reduce
 problems with synced folders.
 
-## Notes and limitations
 
--   This is a metadata-based counting tool, not an authorship
-    identity-verification system.
--   It does not detect equal first authorship; the first entry in
-    Zotero's ordered author list is treated as first author.
--   Results depend on the completeness and accuracy of embedded Zotero
-    metadata.
--   The script has been syntax-checked, but its Word automation needs
-    testing in the target Windows environment.
--   No license is specified here; add a `LICENSE` file if you want to
-    define reuse permissions.
