@@ -55,7 +55,7 @@ If the cache does not yet exist, the script starts with an empty cache and creat
 Open Command Prompt in the script folder and run:
 
 ```cmd
-py zotero_reference_analysis_batch_ipcc_select_debug_author.py
+py zotero_reference_analysis.py
 ```
 
 The script will:
