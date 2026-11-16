@@ -1,16 +1,12 @@
 # Zotero Reference and Self-Citation Analysis
 
-A Python tool for analysing **WGI AR chapter references and chapter-author
-self-citations** in the Microsoft Word version of the drafts containing live Zotero
-citation fields.
+Analyse the references in multiple Microsoft Word chapters, calculate separate self-citation statistics for **Coordinating Lead Authors / Lead Authors (CLA/LA)** and **Contributing Authors (CA)**, and generate a debug report for a **selected author in each chapter**.
+
+The script reads the Zotero citation metadata embedded in Word (`ZOTERO_ITEM`) and copies the rendered bibliography from the `ZOTERO_BIBL` field. It does **not** change the original Word documents.
 
 For instance, you can use the compiled FOD in [Documents/03.Chapters/40.Draft preparation/02.FOD/03.FOD compiled/](https://smu.sharepoint.com/:f:/r/teams/ipccwg1-ar7/Shared%20Documents/03.%20Chapters/40.%20Draft%20preparation/02.%20FOD/03.%20FOD%20compiled?d=w79bb9de1bbcb4aaf8469126041f7846a&csf=1&web=1&e=EJ0Tdi)
 
-It produces a Word report with the chapter author lists, the rendered
-Zotero bibliography, and separate self-citation statistics for
-**Coordinating Lead Authors / Lead Authors (CLA/LA)** and **Contributing
-Authors (CA)**. It also creates a detailed debug report for a selected
-author.
+The script reads the Zotero citation metadata embedded in Word (`ZOTERO_ITEM`) and copies the rendered bibliography from the `ZOTERO_BIBL` field. It does **not** change the original Word documents.
 
 ## Requirements
 
@@ -24,195 +20,167 @@ The Zotero Word add-in is recommended. This tool uses Word COM
 automation and **does not run on macOS or Linux**.
 
 ## Installation
+Install the Python dependency:
 
-Clone or download this repository, then install the dependency:
-
-``` bash
-pip install pywin32
+```cmd
+py -m pip install pywin32
 ```
 
-## Usage
+If `py` is unavailable, try `python -m pip install pywin32`.
 
-Run the script from a terminal or command prompt:
+## Files and folder setup
 
-``` bash
-python zotero_reference_analysis_v11_deduplicated_interactive_debug_fixed.py
+Place the script and the optional IPCC author database together (a .json file containing the database will be created when running the script for the first time!):
+
+```text
+analysis-tools/
+├── zotero_reference_analysis.py
+└── ipcc_author_database_partial.json       # optional; partial, advisory database
 ```
 
-1.  Choose the original Word `.docx` in the file picker.
+Keep your existing verification cache **in the folder containing the Word documents**, not necessarily beside the Python script:
 
-2.  The script extracts CLA, LA and CA names, Zotero citation metadata,
-    and the rendered bibliography.
-
-3.  In the terminal, select the author group for the debug report:
-
-    ``` text
-    Choose the author group for the debug report:
-      1 = CLA/LA
-      2 = CA
-    Enter 1 or 2:
-    ```
-
-4.  The script prints the numbered authors in that group. Enter the
-    **displayed number**, starting at **1**. Internally, the script uses
-    `number - 1` to index the Python list.
-
-5.  The script saves the output documents beside the original `.docx`.
-
-**Important:** Keep the terminal open, because the author-selection
-prompts use `input()`.
-
-If an analysis report already exists, the script may offer to open it
-instead of rerunning. Choose the rerun/replace option to recalculate
-results and generate a new debug report.
-
-## Output files
-
-  ----------------------------------------------------------------------------------------------
-  Output                                                     Description
-  ----------------------------------------------------------------------------------------------
-  `<input>_Reference_Analysis.docx`                          Author lists, formatted Zotero
-                                                             bibliography, and separate CLA/LA
-                                                             and CA self-citation tables
-
-
-    `<input>_Reference_Analysis_DEBUG_<group>_<author>.docx`   First-author and co-author cited
-                                                             works for the selected author,
-                                                             including the complete Zotero
-                                                             author lists, title, year,
-                                                             publication venue and DOI when
-                                                             available
-  ----------------------------------------------------------------------------------------------
-
-The original source document is **not modified**. The main output
-preserves the rendered bibliography as it appears in Word; it does not
-remove duplicate entries from the source bibliography.
-
-## How self-citations are counted
-
-### Author matching
-
-An individual chapter author is matched to Zotero author metadata using:
-
--   Full **first given name** and **family name**
--   Middle names ignored
--   Case, diacritics, selected punctuation and spacing normalized
-
-**Limitations:** Nicknames and different full first names (for example,
-`Jone Smith` versus `Jonathen C. Smith`) are not automatically
-treated as equivalent. Initial-only names such as `J. Smith` are not
-treated as confirmed matches. These may require manual review.
-
-### Publication deduplication
-
-Before calculating statistics, the script tries to count each cited
-publication only once using:
-
-1.  Normalized DOI, where available
-2.  Normalized title and publication year, when compatible
-3.  Zotero item identifiers as a fallback
-
-Records with conflicting non-empty DOIs are not merged solely because
-their titles and years match. Among merged records, the script prefers
-the one with the longer author list.
-
-Deduplication is applied to the **analysis dataset**, not to the
-rendered bibliography in the output Word document.
-
-### Individual-author statistics
-
-For each CLA/LA and CA, the table shows:
-
--   **First-author articles:** distinct cited works where that chapter
-    author is listed first in Zotero
--   **Co-author articles:** distinct cited works where that chapter
-    author appears after the first position
--   **Sum:** first-author + co-author works for that individual
-
-The row labelled **Total sum** aggregates individual-author counts. It
-can count a single paper more than once when several chapter authors
-contributed to it. **Do not interpret that row as the number of unique
-self-cited publications.**
-
-### Unique group-level statistics
-
-The report also includes a **Unique group self-cited papers** row for
-each group (CLA/LA and CA), calculated separately:
-
-  -----------------------------------------------------------------------
-  Measure                             Definition
-  ----------------------------------- -----------------------------------
-  First-author                        Number of distinct cited papers
-                                      whose first author belongs to the
-                                      group
-
-  Co-author                           Number of distinct cited papers
-                                      with at least one group member in a
-                                      non-first-author position
-
-  Total                               Number of distinct cited papers
-                                      with **any** group member anywhere
-                                      in the author list
-  -----------------------------------------------------------------------
-
-First-author and co-author counts are **inclusive** and can overlap. For
-example, if a CLA is first author and an LA is co-author of the same
-paper, that paper contributes 1 to each category but only **1 to
-Total**.
-
-The **Unique self-citation percentage** row divides each unique count by
-the total number of unique cited publications:
-
-``` text
-Unique group self-citation rate =
-    (unique papers involving at least one group member / all unique cited papers) × 100
+```text
+chapter-documents/
+├── Chapter1.docx
+├── Chapter2.docx
+├── ...
+└── author_verification_cache.json          # existing decisions; optional initially
 ```
 
-Publications with **no** chapter authors still count in the denominator.
+If the cache does not yet exist, the script starts with an empty cache and creates it when you make a completed verification decision. Back up an existing cache before large batch runs.
 
-The script **does not calculate a combined all-chapter-authors rate**;
-CLA/LA and CA are reported separately. Their percentages should not be
-added, because a paper may involve authors from both groups.
+## Run
 
-The table's individual-author totals and the unique group totals measure
-different things. The group-level **Total** in the unique row is the
-appropriate numerator for the proportion of cited publications involving
-a member of that group.
+Open Command Prompt in the script folder and run:
 
-## Example
+```cmd
+py zotero_reference_analysis_batch_ipcc_select_debug_author.py
+```
 
-Suppose the chapter cites 10 unique papers. Four involve at least one
-CLA/LA, two involve at least one CA, and one of those papers involves
-both groups.
+The script will:
 
--   CLA/LA unique self-citation rate: `4 / 10 × 100 = 40%`
--   CA unique self-citation rate: `2 / 10 × 100 = 20%`
+1. Open a folder picker. Choose the folder containing the original chapter `.docx` files.
+2. List eligible source files. Previously generated `_Reference_Analysis` and debug files, and Word `~$` temporary files, are excluded.
+3. Ask whether to **replace existing analysis reports**. If you answer **No** (the default), any chapter with an existing analysis report is skipped entirely, including verification and debug-author selection.
+4. Load the **historical verification cache** from the selected document folder and, if present, the **partial IPCC database** from the script folder.
+5. For each processed document, extract Zotero items and chapter authors; verify ambiguous author matches; calculate the statistics.
+6. Ask you to choose a **debug author separately for that document**.
+7. Save the main analysis report and the selected author's debug report beside the source file.
+8. At the end, write a CSV verification report and display a success/skip/failure summary.
 
-The groups overlap, so these percentages must not be summed to estimate
-an overall chapter rate.
+### Select the debug author
+
+For each processed document, the script prompts:
+
+```text
+Choose the author group for the debug report:
+  1 = CLA/LA
+  2 = CA
+Enter 1 or 2:
+```
+
+It then prints the numbered authors in the chosen group:
+
+```text
+CLA_LA authors:
+  1. Author A
+  2. Author B
+  3. Author C
+Enter author number (1-3):
+```
+
+Enter **1** for the first displayed author, **2** for the second, and so on. The script converts this human-readable numbering to Python's zero-based indexing internally. This selection is repeated for **each chapter**, because the author lists can differ.
+
+## Author-name verification
+
+Full first-name + surname matches are counted automatically (middle names are ignored). A potential match involving an initial, such as **C. Smith** versus **Christopher Smith**, triggers a verification step.
+
+**The order of operations is:**
+
+1. Check `author_verification_cache.json` for the specific publication, author position and target chapter author.
+2. Reuse a previously **confirmed** or **rejected** decision without prompting.
+3. If no completed decision exists, display the publication and ambiguous author pair and offer:
+
+   | Choice | Action | Internet? |
+   |---|---|---|
+   | **1** | Confirm the author manually | No |
+   | **2** | Reject the match manually | No |
+   | **3** | Review a suggestion from the local IPCC database, then confirm, reject, search online or skip | No for the local lookup |
+   | **4** | Verify via Crossref, then OpenAlex if needed | **Yes** |
+   | **5** | Skip; leave unresolved for a later run | No |
+
+4. Store completed decisions in the existing JSON cache. The script writes the complete updated JSON file atomically rather than appending raw text. **Unresolved/skipped matches are not cached as final decisions** and can be revisited in a later run.
+5. Use confirmed matches in the calculations. Rejected and unresolved matches are not counted.
+
+### Local IPCC database
+
+`ipcc_author_database_partial.json` is **optional** and currently **incomplete**. The script looks for it **beside the Python script** and indexes its records by DOI. It considers the listed **CLA/LA** names as possible chapter citation authors; CA and Review Editor names are not automatically treated as chapter authors.
+
+The database is **advisory**: an absent name is **not** proof of non-authorship. After reviewing it, you can still confirm or reject the match manually. The script never automatically rejects a match merely because the local IPCC database lacks that name.
+
+### Online verification and confidentiality
+
+The script makes an external request **only if you select online verification**. It uses Crossref first and OpenAlex as a fallback, checking publication identity and author position before accepting a result. If online metadata is insufficient, you can still decide manually or leave the pair unresolved.
+
+Online requests send bibliographic identifiers such as **DOIs or titles** to external services. Do not enable online verification for material whose disclosure is restricted without checking applicable confidentiality requirements. The script does not upload the entire Word document or bibliography as part of this lookup.
+
+## Outputs
+
+For each processed `Chapter1.docx`, the script creates:
+
+| Output | Contents |
+|---|---|
+| `Chapter1_Reference_Analysis.docx` | Extracted chapter author lists, Word-rendered Zotero bibliography, and separate CLA/LA and CA self-citation statistics |
+| `Chapter1_Reference_Analysis_DEBUG_CLA_LA_Author_A.docx` | First-author and co-author references for the selected CLA/LA author; `CA` is used in the filename if you selected that group |
+
+The selected document folder also contains:
+
+| File | Purpose |
+|---|---|
+| `author_verification_cache.json` | Persistent completed manual/online verification decisions; reused in subsequent runs and across chapters |
+| `author_verification_report.csv` | Ambiguous matches encountered in the current batch, their status, method and details; **rewritten on each run**, not a permanent cumulative audit log |
+
+**Keep a backup** of the JSON cache and any CSV reports you need to preserve before rerunning.
+
+## Counting rules
+
+For **each group separately** (CLA/LA and CA):
+
+- **Individual first-author count:** Unique cited publications where that chapter author appears first.
+- **Individual co-author count:** Unique cited publications where that chapter author appears after the first position.
+- **Unique group first-author count:** Distinct cited publications with a group member in first position.
+- **Unique group co-author count:** Distinct cited publications with at least one group member in a later position.
+- **Unique group total:** The **union** of those publications: each cited publication is counted **once**, even if multiple members of the group wrote it.
+- **Group self-citation rate:** `100 × unique group total / all unique cited publications`.
+
+A publication can contribute to **both** the first-author and co-author group categories (if different group members occupy those positions), but only **once** to the group total. The **Total sum** row sums individual author counts and may double-count papers; use **Unique group self-cited papers** and **Unique self-citation percentage** for group-level interpretation.
+
+The script does **not** calculate a combined all-chapter-authors rate. Publications without a chapter-author match remain in the denominator.
+
+The script deduplicates structured Zotero records for analysis using DOI/title/year and fallback identifiers. It does **not** rewrite or deduplicate the bibliography displayed in the Word report.
 
 ## Troubleshooting
 
-**No Zotero items found:** Check that the original document contains
-live Zotero `ZOTERO_ITEM` fields rather than plain-text citations.
+**The script asks me to verify an author I verified previously.** Check that the correct `author_verification_cache.json` is in the **selected Word-document folder**. Cache keys also depend on publication identity, author position and chapter-author name, so changed metadata may lead to a new prompt.
 
-**Bibliography field not found:** The document needs a Zotero-generated
-`ZOTERO_BIBL` field.
+**I cannot select a debug author.** If the main analysis report already exists and you answered **No** to replacement, the chapter is skipped. Rerun and choose **Yes** to regenerate it.
 
-**Unexpected author names:** The script expects recognizable
-`Coordinating Lead Authors`, `Lead Authors` and `Contributing Authors`
-headings in the source document. Inspect the extracted lists.
+**The local IPCC database is not found.** Place `ipcc_author_database_partial.json` beside the `.py` script. The script can still work without it using the historical cache, manual verification and optional online verification.
 
-**Duplicate references in the bibliography:** The analysis deduplicates
-citation metadata, but the bibliography is copied from Word as rendered.
-Correct duplicates in Zotero/the source document if the displayed
-bibliography itself must be cleaned.
+**No usable Zotero metadata or bibliography field found.** Use the original document with live Zotero fields, not a plain-text or unlinked bibliography.
 
-**Missing matches for an author:** Check Zotero's given/family names and
-name variants; initials and nicknames are not automatically resolved.
+**An author was not matched.** Check the Zotero given/family names. Initial-only names require verification; different full first names and nicknames are not automatically considered equivalent.
 
-**Word errors:** Close conflicting Word dialogs and ensure the source
-file is accessible. The script uses a temporary local copy to reduce
-problems with synced folders.
+**A document fails.** The batch processor reports the error and continues with other files. Review the failure summary at the end.
+
+## Limitations
+
+- Requires **Windows and Microsoft Word COM automation**; not tested on macOS or Linux.
+- The local IPCC database is partial and should not be considered a complete official author registry.
+- Online bibliographic services may return incomplete or incorrect IPCC chapter authorship metadata.
+- Joint first authorship is not inferred; the first author in Zotero's ordered author list is treated as first author.
+- Results depend on the quality of the source Zotero metadata and the accuracy of manual verification decisions.
+- The script was reviewed for its implemented workflow; Word automation and live API behavior must be tested on your Windows installation.
 
 
